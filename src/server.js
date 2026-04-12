@@ -42,6 +42,10 @@ async function buildAircraftData(ip) {
 function clientIp(req) {
   const overrideAllowed = process.env.NODE_ENV !== 'production';
   if (overrideAllowed && req.query.ip) return req.query.ip;
+  // X-Forwarded-For is "client, proxy1, proxy2, ..." — leftmost is always the real client.
+  // Reading it directly avoids trust-proxy hop-count mismatches with Railway's multi-hop ingress.
+  const xff = req.headers['x-forwarded-for'];
+  if (xff) return xff.split(',')[0].trim();
   return req.ip || '0.0.0.0';
 }
 

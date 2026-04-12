@@ -310,7 +310,7 @@ function renderPage(data) {
     const heading = (a.last_position && a.last_position.heading != null)
       ? Number(a.last_position.heading) : 0;
     const svg =
-      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="35" height="35">' +
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="45" height="45">' +
         // fuselage
         '<polygon points="16,2 19.5,26 16,21 12.5,26" fill="' + color + '" stroke="white" stroke-width="1.5" stroke-linejoin="round"/>' +
         // wings
@@ -320,9 +320,9 @@ function renderPage(data) {
       '</svg>';
     return L.divIcon({
       className: '',
-      html: '<div style="width:35px;height:35px;transform:rotate(' + heading + 'deg);filter:drop-shadow(0 1px 3px rgba(0,0,0,0.5))">' + svg + '</div>',
-      iconSize: [35, 35],
-      iconAnchor: [17, 17],
+      html: '<div style="width:45px;height:45px;transform:rotate(' + heading + 'deg);filter:drop-shadow(0 1px 3px rgba(0,0,0,0.5))">' + svg + '</div>',
+      iconSize: [45, 45],
+      iconAnchor: [22, 22],
     });
   }
 
@@ -341,7 +341,8 @@ function renderPage(data) {
         setTimeout(function () {
           const card = document.querySelector('.card[data-ident="' + a.ident + '"]');
           if (!card) return;
-          if (!card.classList.contains('open')) card.classList.add('open');
+          document.querySelectorAll('.card.open').forEach(function (c) { c.classList.remove('open'); });
+          card.classList.add('open');
           card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }, 50);
       });

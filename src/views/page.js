@@ -85,7 +85,7 @@ function renderPage(data) {
     origin: a.origin ? { code: a.origin.code, city: a.origin.city } : null,
     destination: a.destination ? { code: a.destination.code, city: a.destination.city } : null,
     last_position: a.last_position
-      ? { latitude: a.last_position.latitude, longitude: a.last_position.longitude, altitude: a.last_position.altitude }
+      ? { latitude: a.last_position.latitude, longitude: a.last_position.longitude, altitude: a.last_position.altitude, heading: a.last_position.heading }
       : null,
   }));
 
@@ -301,6 +301,31 @@ function renderPage(data) {
 
   window._aircraftLayer = L.layerGroup().addTo(map);
 
+  function planeIcon(a) {
+    const r = a.interestingReason;
+    const color = r && r.startsWith('emergency') ? '#dc2626'
+                : r === 'medical'               ? '#16a34a'
+                : '#1d4ed8';
+    // heading 0 = north; SVG body points up so no offset needed.
+    const heading = (a.last_position && a.last_position.heading != null)
+      ? Number(a.last_position.heading) : 0;
+    const svg =
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="35" height="35">' +
+        // fuselage
+        '<polygon points="16,2 19.5,26 16,21 12.5,26" fill="' + color + '" stroke="white" stroke-width="1.5" stroke-linejoin="round"/>' +
+        // wings
+        '<polygon points="1,16 16,11 31,16 16,18" fill="' + color + '" stroke="white" stroke-width="1.5" stroke-linejoin="round"/>' +
+        // tail fins
+        '<polygon points="10,24 16,21 22,24 16,26" fill="' + color + '" stroke="white" stroke-width="1" stroke-linejoin="round"/>' +
+      '</svg>';
+    return L.divIcon({
+      className: '',
+      html: '<div style="width:35px;height:35px;transform:rotate(' + heading + 'deg);filter:drop-shadow(0 1px 3px rgba(0,0,0,0.5))">' + svg + '</div>',
+      iconSize: [35, 35],
+      iconAnchor: [17, 17],
+    });
+  }
+
   function rebuildMarkers(aircraft) {
     window._aircraftLayer.clearLayers();
     window._markers = {};
@@ -308,17 +333,17 @@ function renderPage(data) {
       if (!a.last_position) return;
       const lat = a.last_position.latitude;
       const lon = a.last_position.longitude;
-      const icon = L.divIcon({
-        className: '',
-        html: '<div style="font-size:18px;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.4))">\u2708\uFE0F</div>',
-        iconSize: [20, 20], iconAnchor: [10, 10],
-      });
       const rawLabel = a.ident + ' \u2022 ' + a.friendlyType + ' \u2022 ' + a.distanceNm + ' nm';
       const label = rawLabel.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-      const marker = L.marker([lat, lon], { icon }).bindPopup(label);
+      const marker = L.marker([lat, lon], { icon: planeIcon(a) }).bindPopup(label);
       marker.on('click', function () {
-        const card = document.querySelector('[data-ident="' + a.ident + '"]');
-        if (card) { card.classList.add('open'); card.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
+        // Small delay lets Leaflet finish its own click handling before we scroll.
+        setTimeout(function () {
+          const card = document.querySelector('.card[data-ident="' + a.ident + '"]');
+          if (!card) return;
+          if (!card.classList.contains('open')) card.classList.add('open');
+          card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 50);
       });
       marker.addTo(window._aircraftLayer);
       window._markers[a.ident] = marker;

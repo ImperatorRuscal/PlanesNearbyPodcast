@@ -25,7 +25,7 @@ test('returns array of flights from AeroAPI', async () => {
   expect(result).toHaveLength(1);
   expect(result[0].ident).toBe('DAL247');
   expect(fetch).toHaveBeenCalledWith(
-    expect.stringContaining('32.78'),
+    expect.stringContaining('latlong'),
     expect.objectContaining({ headers: expect.objectContaining({ 'x-apikey': expect.any(String) }) })
   );
 });
@@ -40,8 +40,12 @@ test('throws on non-ok response', async () => {
   await expect(getNearbyFlights(32.78, -96.80)).rejects.toThrow('FlightAware API error: 403');
 });
 
-test('includes radius of 10 in request URL', async () => {
+test('URL contains a bounding box derived from lat/lon', async () => {
   global.fetch.mockResolvedValueOnce({ ok: true, json: async () => ({ flights: [], num_pages: 1 }) });
   await getNearbyFlights(32.78, -96.80);
-  expect(fetch.mock.calls[0][0]).toContain('10');
+  const url = fetch.mock.calls[0][0];
+  // Bounding box should contain four coordinates around the input lat/lon
+  expect(url).toContain('latlong');
+  expect(url).toContain('32.6'); // minLat near 32.78 (32.78 - 10/60 ≈ 32.613)
+  expect(url).toContain('96.');  // minLon/maxLon near -96.80
 });

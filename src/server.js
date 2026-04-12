@@ -12,6 +12,10 @@ const app = express();
 app.set('trust proxy', 1);
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
+function escHtml(s) {
+  return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
 const CACHE_TTL_MS = 5 * 60 * 1000;
 const cache = new Cache(CACHE_TTL_MS);
 const PORT = process.env.PORT || 3000;
@@ -36,7 +40,9 @@ async function buildAircraftData(ip) {
 }
 
 function clientIp(req) {
-  return req.query.ip || req.ip || '0.0.0.0';
+  const overrideAllowed = process.env.NODE_ENV !== 'production';
+  if (overrideAllowed && req.query.ip) return req.query.ip;
+  return req.ip || '0.0.0.0';
 }
 
 // ── GET /api/aircraft ─────────────────────────────────────────────────────
@@ -61,7 +67,7 @@ app.get('/', async (req, res) => {
     res.send(renderPage({ ...data, expiresAt: meta?.expiresAt ?? data.expiresAt }));
   } catch (err) {
     console.error('[/]', err.message);
-    res.status(500).send(`<!DOCTYPE html><html><body><h1>Something went wrong</h1><p>${err.message}</p><p><a href="/">Try again</a></p></body></html>`);
+    res.status(500).send(`<!DOCTYPE html><html><body><h1>Something went wrong</h1><p>${escHtml(err.message)}</p><p><a href="/">Try again</a></p></body></html>`);
   }
 });
 

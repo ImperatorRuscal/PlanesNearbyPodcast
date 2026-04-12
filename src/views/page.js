@@ -313,7 +313,8 @@ function renderPage(data) {
         html: '<div style="font-size:18px;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.4))">\u2708\uFE0F</div>',
         iconSize: [20, 20], iconAnchor: [10, 10],
       });
-      const label = a.ident + ' \u2022 ' + a.friendlyType + ' \u2022 ' + a.distanceNm + ' nm';
+      const rawLabel = a.ident + ' \u2022 ' + a.friendlyType + ' \u2022 ' + a.distanceNm + ' nm';
+      const label = rawLabel.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
       const marker = L.marker([lat, lon], { icon }).bindPopup(label);
       marker.on('click', function () {
         const card = document.querySelector('[data-ident="' + a.ident + '"]');

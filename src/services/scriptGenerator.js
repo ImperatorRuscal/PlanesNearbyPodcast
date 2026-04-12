@@ -119,6 +119,7 @@ const AIRLINE_CALLSIGNS = {
 
   // ── NetJets / fractional ──────────────────────────────────────────────────
   EJA: { name: 'NetJets',            callsign: 'EJA'          },
+  LJX: { name: 'Flexjet',            callsign: 'Flexjet'      },
 };
 
 // ── Altitude phrases — multiple per band, picked deterministically by ident ──

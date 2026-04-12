@@ -18,7 +18,7 @@ async function getGeolocation(ip, now = new Date()) {
   const times = SunCalc.getTimes(now, lat, lon);
   const theme = now >= times.sunrise && now < times.sunset ? 'day' : 'night';
 
-  return { lat, lon, city: data.city || 'Unknown City', state: data.state_prov || '', theme };
+  return { lat, lon, city: data.city || 'Unknown City', state: data.state_prov || '', countryCode: data.country_code2 || '', theme };
 }
 
 module.exports = { getGeolocation };

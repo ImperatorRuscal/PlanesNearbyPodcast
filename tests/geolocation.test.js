@@ -14,6 +14,7 @@ const MOCK_RESPONSE = {
   longitude: '-96.7970',
   city: 'Dallas',
   state_prov: 'Texas',
+  country_code2: 'US',
 };
 
 test('returns location and theme:day when sun is up', async () => {
@@ -23,7 +24,7 @@ test('returns location and theme:day when sun is up', async () => {
     sunset:  new Date('2024-04-23T23:30:00Z'),
   });
   const result = await getGeolocation('8.8.8.8', new Date('2024-04-23T14:00:00Z'));
-  expect(result).toEqual({ lat: 32.7767, lon: -96.797, city: 'Dallas', state: 'Texas', theme: 'day' });
+  expect(result).toEqual({ lat: 32.7767, lon: -96.797, city: 'Dallas', state: 'Texas', countryCode: 'US', theme: 'day' });
 });
 
 test('returns theme:night when sun is down', async () => {

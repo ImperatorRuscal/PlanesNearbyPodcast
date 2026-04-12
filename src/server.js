@@ -31,7 +31,7 @@ async function buildAircraftData(ip) {
   const location = await getGeolocation(ip);
   const rawFlights = await getNearbyFlights(location.lat, location.lon);
   const processed = processFlights(rawFlights, location.lat, location.lon);
-  const aircraft = processed.map(a => ({ ...a, script: generateScript(a) }));
+  const aircraft = processed.map(a => ({ ...a, script: generateScript(a, location.countryCode) }));
 
   const cachedAt = Date.now();
   const data = { location, aircraft, theme: location.theme, cachedAt, expiresAt: cachedAt + CACHE_TTL_MS };

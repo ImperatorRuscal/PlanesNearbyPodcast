@@ -1,0 +1,73 @@
+name: Railway Preview Comment
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  pull-requests: write
+
+jobs:
+  post-preview-url:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Poll Railway for preview deployment URL
+        id: get-url
+        uses: actions/github-script@v7
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
+        with:
+          result-encoding: string
+          script: |
+            const branch = context.payload.pull_request.head.ref;
+            const branchSlug = branch.toLowerCase().replace(/[^a-z0-9]/g, '-').slice(0, 20);
+            const maxAttempts = 20;
+            const delayMs = 15000;
+
+            for (let attempt = 0; attempt < maxAttempts; attempt++) {
+              if (attempt > 0) await new Promise(r => setTimeout(r, delayMs));
+
+              const res = await fetch('https://backboard.railway.app/graphql/v2', {
+                method: 'POST',
+                headers: {
+                  'Authorization': 'Bearer ' + process.env.RAILWAY_TOKEN,
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ query: '{project(id:"' + process.env.RAILWAY_PROJECT_ID + '"){environments{edges{node{name deployments(first:3){edges{node{status staticUrl}}}}}}}}' }),
+              });
+
+              const json = await res.json();
+              const envs = json?.data?.project?.environments?.edges ?? [];
+
+              for (const env of envs) {
+                if (!env.node.name.toLowerCase().includes(branchSlug)) continue;
+                for (const dep of env.node.deployments.edges) {
+                  if (dep.node.status === 'SUCCESS' && dep.node.staticUrl) {
+                    return 'https://' + dep.node.staticUrl;
+                  }
+                }
+              }
+            }
+            return '';
+
+      - name: Find existing preview comment
+        uses: peter-evans/find-comment@v3
+        id: find-comment
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: 'Railway Preview'
+
+      - name: Post or update preview comment
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          comment-id: ${{ steps.find-comment.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          edit-mode: replace
+          body: |
+            ## 🚂 Railway Preview Deployment
+
+            ${{ steps.get-url.outputs.result != '' && format('**Preview URL:** {0}', steps.get-url.outputs.result) || ':hourglass: Deployment still building — check the [Railway dashboard](https://railway.app) or re-push to retry.' }}
+
+            _Branch: `${{ github.head_ref }}` | Triggered by push to `${{ github.sha }}`_

@@ -101,6 +101,7 @@ function renderPage(data) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Planes Near ${locationLabel || 'You'}</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""><\/script>
   <style>

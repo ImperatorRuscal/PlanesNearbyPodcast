@@ -79,7 +79,7 @@ const AIRCRAFT_NAMES = {
   PA46:'Piper Malibu',
   BE36:'Beechcraft Bonanza', BE58:'Beechcraft Baron',
   BE20:'Beechcraft King Air 200', BE9L:'Beechcraft King Air 90',
-  SR20:'Cirrus SR20', SR22:'Cirrus SR22',
+  SR20:'Cirrus SR20', SR22:'Cirrus SR22', SR22T:'Cirrus SR22 Turbo', S22T:'Cirrus SR22 Turbo',
   TBM8:'Daher TBM 850', TBM9:'Daher TBM 930',
   PC12:'Pilatus PC-12',
 

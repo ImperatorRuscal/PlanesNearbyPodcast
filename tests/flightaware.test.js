@@ -46,6 +46,6 @@ test('URL contains a bounding box derived from lat/lon', async () => {
   const url = fetch.mock.calls[0][0];
   // Bounding box should contain four coordinates around the input lat/lon
   expect(url).toContain('latlong');
-  expect(url).toContain('32.6'); // minLat near 32.78 (32.78 - 10/60 ≈ 32.613)
+  expect(url).toContain('32.5'); // minLat near 32.78 (32.78 - 15/60 ≈ 32.530)
   expect(url).toContain('96.');  // minLon/maxLon near -96.80
 });

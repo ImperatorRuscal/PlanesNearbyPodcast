@@ -1,5 +1,5 @@
 const AEROAPI_BASE = 'https://aeroapi.flightaware.com/aeroapi';
-const SEARCH_RADIUS_NM = 10;
+const SEARCH_RADIUS_NM = 15;
 
 /**
  * Convert nautical miles to degrees of latitude.

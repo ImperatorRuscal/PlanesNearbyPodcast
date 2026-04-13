@@ -271,8 +271,11 @@ function renderPage(data) {
 
   // ── Card expand/collapse ──────────────────────────────────────────────────
   window.toggleCard = function (el) {
+    const opening = !el.classList.contains('open');
+    // Close all other open cards first
+    document.querySelectorAll('.card.open').forEach(function (c) { if (c !== el) c.classList.remove('open'); });
     el.classList.toggle('open');
-    if (el.classList.contains('open')) {
+    if (opening && el.classList.contains('open')) {
       const lat = parseFloat(el.dataset.lat);
       const lon = parseFloat(el.dataset.lon);
       if (!isNaN(lat) && !isNaN(lon) && window._map) {

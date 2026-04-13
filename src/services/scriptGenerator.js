@@ -35,6 +35,14 @@ const AIRLINE_CALLSIGNS = {
   AWI: { name: 'Air Wisconsin',       callsign: 'Air Wisconsin'},
   PDT: { name: 'Piedmont Airlines',   callsign: 'Piedmont'    },
   JKA: { name: 'LeTourneau University', callsign: 'Jacket'    },
+  EDV: { name: 'Endeavor Air',        callsign: 'Endeavor'    },
+  JIA: { name: 'PSA Airlines',        callsign: 'Speed'       },
+  AAY: { name: 'Allegiant Air',       callsign: 'Allegiant'   },
+  SCX: { name: 'Sun Country Airlines',callsign: 'Sun Country' },
+  KAP: { name: 'Cape Air',            callsign: 'Cape Air'    },
+  MHO: { name: 'Mokulele Airlines',   callsign: 'Mokulele'    },
+  VTE: { name: 'Contour Airlines',    callsign: 'Contour'     },
+  VXP: { name: 'Avelo Airlines',      callsign: 'Avelo'       },
 
   // ── US cargo ──────────────────────────────────────────────────────────────
   FDX: { name: 'FedEx',              callsign: 'FedEx'        },
@@ -42,11 +50,16 @@ const AIRLINE_CALLSIGNS = {
   GTI: { name: 'Atlas Air',          callsign: 'Giant'        },
   ABX: { name: 'ABX Air',            callsign: 'Abex'         },
   ATN: { name: 'Air Transport International', callsign: 'Cargo Express' },
+  CLX: { name: 'Cargolux',           callsign: 'Cargolux'     },
+  PAC: { name: 'Polar Air Cargo',    callsign: 'Polar'        },
 
   // ── Canada & Mexico ───────────────────────────────────────────────────────
   ACA: { name: 'Air Canada',         callsign: 'Air Canada'   },
   WJA: { name: 'WestJet',            callsign: 'WestJet'      },
   TSC: { name: 'Air Transat',        callsign: 'Transat'      },
+  JZA: { name: 'Jazz Air',           callsign: 'Jazz'         },
+  CAW: { name: 'Cargojet Airways',   callsign: 'Cargojet'     },
+  FLE: { name: 'Flair Airlines',     callsign: 'Flair'        },
   AMX: { name: 'Aeromexico',         callsign: 'Aeromexico'   },
   VOI: { name: 'Volaris',            callsign: 'Volaris'      },
   VIV: { name: 'VivaAerobus',        callsign: 'VivaAerobus'  },
@@ -56,6 +69,10 @@ const AIRLINE_CALLSIGNS = {
   CMP: { name: 'Copa Airlines',      callsign: 'Copa'         },
   LAN: { name: 'LATAM Airlines',     callsign: 'LAN'          },
   TAM: { name: 'LATAM Brasil',       callsign: 'LATAM'        },
+  AVA: { name: 'Avianca',            callsign: 'Avianca'      },
+  GLO: { name: 'GOL',                callsign: 'Gol'          },
+  AZU: { name: 'Azul Brazilian Airlines', callsign: 'Azul'    },
+  ARG: { name: 'Aerolíneas Argentinas', callsign: 'Argentina' },
 
   // ── Europe ────────────────────────────────────────────────────────────────
   BAW: { name: 'British Airways',    callsign: 'Speedbird'    },
@@ -81,6 +98,15 @@ const AIRLINE_CALLSIGNS = {
   LOT: { name: 'LOT Polish Airlines',callsign: 'LOT'          },
   AUI: { name: 'Ukraine International Airlines', callsign: 'Ukraine' },
   AFL: { name: 'Aeroflot',           callsign: 'Aeroflot'     },
+  EIN: { name: 'Aer Lingus',         callsign: 'Shamrock'     },
+  SWR: { name: 'Swiss International Air Lines', callsign: 'Swiss' },
+  AUA: { name: 'Austrian Airlines',  callsign: 'Austrian'     },
+  AEE: { name: 'Aegean Airlines',    callsign: 'Aegean'       },
+  WZZ: { name: 'Wizz Air',           callsign: 'Wizzair'      },
+  PGT: { name: 'Pegasus Airlines',   callsign: 'Pegasus'      },
+  TRA: { name: 'Transavia',          callsign: 'Transavia'    },
+  CFG: { name: 'Condor',             callsign: 'Condor'       },
+  CTN: { name: 'Croatia Airlines',   callsign: 'Croatia'      },
 
   // ── Middle East & Africa ──────────────────────────────────────────────────
   UAE: { name: 'Emirates',           callsign: 'Emirates'     },
@@ -96,6 +122,10 @@ const AIRLINE_CALLSIGNS = {
   MSR: { name: 'EgyptAir',           callsign: 'Egyptair'     },
   SAA: { name: 'South African Airways', callsign: 'Springbok' },
   THY: { name: 'Turkish Airlines',   callsign: 'Turkish'      },
+  MEA: { name: 'Middle East Airlines', callsign: 'Cedar Jet'  },
+  OMA: { name: 'Oman Air',           callsign: 'Oman Air'     },
+  RJA: { name: 'Royal Jordanian',    callsign: 'Jordanian'    },
+  PIA: { name: 'Pakistan International Airlines', callsign: 'Pakistan' },
 
   // ── Asia Pacific ──────────────────────────────────────────────────────────
   QFA: { name: 'Qantas',             callsign: 'Qantas'       },
@@ -116,6 +146,17 @@ const AIRLINE_CALLSIGNS = {
   GIA: { name: 'Garuda Indonesia',   callsign: 'Indonesia'    },
   IGO: { name: 'IndiGo',             callsign: 'IndiGo'       },
   AIC: { name: 'Air India',          callsign: 'Air India'    },
+  ANZ: { name: 'Air New Zealand',    callsign: 'New Zealand'  },
+  JST: { name: 'Jetstar Airways',    callsign: 'Jetstar'      },
+  VOZ: { name: 'Virgin Australia',   callsign: 'Velocity'     },
+  EVA: { name: 'EVA Air',            callsign: 'Eva'          },
+  CEB: { name: 'Cebu Pacific',       callsign: 'Cebu Air'     },
+  ALK: { name: 'SriLankan Airlines', callsign: 'Sri Lankan'   },
+  AXM: { name: 'AirAsia',            callsign: 'AirAsia'      },
+  LNI: { name: 'Lion Air',           callsign: 'Lion'         },
+  BTK: { name: 'Batik Air',          callsign: 'Batik'        },
+  SEJ: { name: 'SpiceJet',           callsign: 'Spicejet'     },
+  FJI: { name: 'Fiji Airways',       callsign: 'Fiji'         },
 
   // ── NetJets / fractional ──────────────────────────────────────────────────
   EJA: { name: 'NetJets',            callsign: 'EJA'          },

@@ -81,6 +81,7 @@ function renderPage(data) {
     interesting: a.interesting,
     interestingReason: a.interestingReason,
     isHelicopter: a.isHelicopter || false,
+    aircraft_type: a.aircraft_type || null,
     flightawareUrl: a.flightawareUrl,
     script: a.script,
     origin: a.origin ? { code: a.origin.code, city: a.origin.city } : null,

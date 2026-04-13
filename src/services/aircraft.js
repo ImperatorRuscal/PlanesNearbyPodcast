@@ -204,11 +204,22 @@ function processFlights(flights, userLat, userLon) {
 
   const enriched = airborne.map(f => {
     const dist = haversineNm(userLat, userLon, f.last_position.latitude, f.last_position.longitude);
+    // Type-code confirmed rotorcraft
+    const typeConfirmed = HELICOPTER_TYPES.has(f.aircraft_type || '');
+    // Heuristic fallback: no type code + registration-style ident + no route + slow + low
+    const gs  = f.last_position.groundspeed;
+    const alt = f.last_position.altitude;
+    const heuristicHeli = !f.aircraft_type
+      && !(/^[A-Z]{3}\d/.test(f.ident || ''))
+      && !f.origin && !f.destination
+      && typeof gs  === 'number' && gs  > 0 && gs  < 120
+      && typeof alt === 'number' && alt > 0 && alt < 30;
+    const isHelicopter = typeConfirmed || heuristicHeli;
     return {
       ...f,
       distanceNm: Math.round(dist * 10) / 10,
-      isHelicopter: HELICOPTER_TYPES.has(f.aircraft_type || ''),
-      friendlyType: AIRCRAFT_NAMES[f.aircraft_type] || f.aircraft_type || 'airplane',
+      isHelicopter,
+      friendlyType: AIRCRAFT_NAMES[f.aircraft_type] || f.aircraft_type || (isHelicopter ? 'helicopter' : 'airplane'),
       flightawareUrl: `https://www.flightaware.com/live/flight/${f.ident}`,
       ...tagInteresting(f),
     };

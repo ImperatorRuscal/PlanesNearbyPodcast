@@ -337,7 +337,7 @@ function formatTime(isoString) {
  */
 function generateScript(aircraft, countryCode) {
   const parts = [];
-  const type = aircraft.friendlyType || 'airplane';
+  const type = aircraft.friendlyType || (aircraft.isHelicopter ? 'helicopter' : 'airplane');
   const dist = formatDistance(aircraft.distanceNm, countryCode);
   const ident = aircraft.ident || aircraft.registration;
 
@@ -378,8 +378,10 @@ function generateScript(aircraft, countryCode) {
     }
   }
 
-  const altDesc = formatAltitude(aircraft.last_position?.altitude, ident);
-  if (altDesc) parts.push(`Right now it is flying at ${altDesc}.`);
+  if (!aircraft.isHelicopter) {
+    const altDesc = formatAltitude(aircraft.last_position?.altitude, ident);
+    if (altDesc) parts.push(`Right now it is flying at ${altDesc}.`);
+  }
 
   return parts.join(' ');
 }

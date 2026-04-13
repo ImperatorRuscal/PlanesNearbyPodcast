@@ -46,7 +46,7 @@ function renderCard(aircraft, index) {
   return `<div class="${esc(cardClass)}" data-ident="${esc(a.ident)}" data-lat="${esc(String(lat))}" data-lon="${esc(String(lon))}" onclick="toggleCard(this)">
   <div class="card-header">
     <div class="card-title">
-      &#x2708;&#xFE0F; ${esc(a.ident)}
+      ${a.isHelicopter ? '&#x1F681;' : '&#x2708;&#xFE0F;'} ${esc(a.ident)}
       <a class="fa-link" href="${safeUrl}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" title="View on FlightAware">
         <img src="/fa-logo.png" alt="FlightAware" onerror="this.style.display='none'">
       </a>
@@ -80,6 +80,7 @@ function renderPage(data) {
     distanceNm: a.distanceNm,
     interesting: a.interesting,
     interestingReason: a.interestingReason,
+    isHelicopter: a.isHelicopter || false,
     flightawareUrl: a.flightawareUrl,
     script: a.script,
     origin: a.origin ? { code: a.origin.code, city: a.origin.city } : null,
@@ -410,7 +411,7 @@ function renderPage(data) {
 
     const titleDiv = document.createElement('div');
     titleDiv.className = 'card-title';
-    titleDiv.appendChild(document.createTextNode('\u2708\uFE0F ' + (a.ident || 'Unknown')));
+    titleDiv.appendChild(document.createTextNode((a.isHelicopter ? '\uD83D\uDE81' : '\u2708\uFE0F') + ' ' + (a.ident || 'Unknown')));
 
     // FA link — href is always https://www.flightaware.com/... constructed by server
     if (a.flightawareUrl && a.flightawareUrl.startsWith('https://')) {

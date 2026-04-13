@@ -137,9 +137,9 @@ describe('processFlights', () => {
     expect(result[0].isHelicopter).toBe(true);
   });
 
-  test('heuristic detects no-type slow+low registration flight as helicopter', () => {
+  test('heuristic detects no-type slow+low registration flight as helicopter (origin present, no destination)', () => {
     const f = makeFlight('N505FW', 32.79, -96.81, {
-      aircraft_type: null, origin: null, destination: null,
+      aircraft_type: null, destination: null,
       last_position: { latitude: 32.79, longitude: -96.81, altitude: 8, groundspeed: 70 },
     });
     const result = processFlights([f], uLat, uLon);

@@ -211,7 +211,7 @@ function processFlights(flights, userLat, userLon) {
     const alt = f.last_position.altitude;
     const heuristicHeli = !f.aircraft_type
       && !(/^[A-Z]{3}\d/.test(f.ident || ''))
-      && !f.origin && !f.destination
+      && !f.destination
       && typeof gs  === 'number' && gs  > 0 && gs  < 120
       && typeof alt === 'number' && alt > 0 && alt < 30;
     const isHelicopter = typeConfirmed || heuristicHeli;

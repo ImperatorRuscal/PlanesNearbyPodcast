@@ -340,6 +340,7 @@ function generateScript(aircraft, countryCode) {
   const type = aircraft.friendlyType || (aircraft.isHelicopter ? 'helicopter' : 'airplane');
   const dist = formatDistance(aircraft.distanceNm, countryCode);
   const ident = aircraft.ident || aircraft.registration;
+  const article = /^[AaEeIiOoUu]/.test(type) ? 'an' : 'a';
 
   if (aircraft.interesting && aircraft.interestingReason) {
     if (aircraft.interestingReason === 'military') {
@@ -355,10 +356,10 @@ function generateScript(aircraft, countryCode) {
   const airline = lookupAirline(ident);
   const distCap = dist.charAt(0).toUpperCase() + dist.slice(1);
   if (airline) {
-    parts.push(`${distCap} away from you, there is a ${type} on ${airline.name} flight ${airline.flightNum}.`);
+    parts.push(`${distCap} away from you, there is ${article} ${type} on ${airline.name} flight ${airline.flightNum}.`);
   } else {
     const rawIdent = ident || 'unknown';
-    parts.push(`${distCap} away from you, there is a ${type} with the callsign ${rawIdent}.`);
+    parts.push(`${distCap} away from you, there is ${article} ${type} with the callsign ${rawIdent}.`);
   }
 
   // Route sentence: subsequent mention uses the shorter radio callsign

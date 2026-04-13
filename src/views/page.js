@@ -261,6 +261,7 @@ function renderPage(data) {
       expiresAt = data.expiresAt;
       rebuildCards(data.aircraft);
       rebuildMarkers(data.aircraft);
+      fitAllAircraft();
       document.getElementById('update-time').textContent = 'Updated just now';
       updateCountdown();
     } catch (_e) {
@@ -283,16 +284,33 @@ function renderPage(data) {
         const marker = window._markers && window._markers[el.dataset.ident];
         if (marker) marker.openPopup();
       }
+    } else if (!document.querySelector('.card.open')) {
+      fitAllAircraft();
     }
   };
 
   // ── Leaflet map ───────────────────────────────────────────────────────────
   const rawData = JSON.parse(document.getElementById('pnp-data').textContent);
   const loc = rawData.location;
+  let _currentAircraft = rawData.aircraft || [];
 
-  const map = L.map('map').setView([loc.lat, loc.lon], 11);
+  const map = L.map('map');
   window._map = map;
   window._markers = {};
+
+  function fitAllAircraft() {
+    var points = [[loc.lat, loc.lon]];
+    _currentAircraft.forEach(function (a) {
+      if (a.last_position && a.last_position.latitude != null && a.last_position.longitude != null) {
+        points.push([a.last_position.latitude, a.last_position.longitude]);
+      }
+    });
+    if (points.length > 1) {
+      map.fitBounds(L.latLngBounds(points), { padding: [48, 48] });
+    } else {
+      map.setView([loc.lat, loc.lon], 11);
+    }
+  }
 
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '\u00a9 <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
@@ -331,9 +349,10 @@ function renderPage(data) {
   }
 
   function rebuildMarkers(aircraft) {
+    _currentAircraft = aircraft || [];
     window._aircraftLayer.clearLayers();
     window._markers = {};
-    (aircraft || []).forEach(function (a) {
+    _currentAircraft.forEach(function (a) {
       if (!a.last_position) return;
       const lat = a.last_position.latitude;
       const lon = a.last_position.longitude;
@@ -348,6 +367,7 @@ function renderPage(data) {
           document.querySelectorAll('.card.open').forEach(function (c) { c.classList.remove('open'); });
           card.classList.add('open');
           card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          map.setView([lat, lon], 13);
         }, 50);
       });
       marker.addTo(window._aircraftLayer);
@@ -465,6 +485,7 @@ function renderPage(data) {
 
   // ── Init ──────────────────────────────────────────────────────────────────
   rebuildMarkers(rawData.aircraft);
+  fitAllAircraft();
   const firstCard = document.querySelector('.card');
   if (firstCard) firstCard.classList.add('open');
 })();

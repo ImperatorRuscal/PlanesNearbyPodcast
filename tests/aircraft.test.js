@@ -127,4 +127,28 @@ describe('processFlights', () => {
     expect(result[0].friendlyType).toBeDefined();
     expect(result[0].flightawareUrl).toBe('https://www.flightaware.com/live/flight/DAL247');
   });
+
+  test('known helicopter type code sets isHelicopter=true', () => {
+    const f = makeFlight('N505FW', 32.79, -96.81, {
+      aircraft_type: 'B505', origin: null, destination: null,
+      last_position: { latitude: 32.79, longitude: -96.81, altitude: 8, groundspeed: 70 },
+    });
+    const result = processFlights([f], uLat, uLon);
+    expect(result[0].isHelicopter).toBe(true);
+  });
+
+  test('heuristic detects no-type slow+low registration flight as helicopter', () => {
+    const f = makeFlight('N505FW', 32.79, -96.81, {
+      aircraft_type: null, origin: null, destination: null,
+      last_position: { latitude: 32.79, longitude: -96.81, altitude: 8, groundspeed: 70 },
+    });
+    const result = processFlights([f], uLat, uLon);
+    expect(result[0].isHelicopter).toBe(true);
+    expect(result[0].friendlyType).toBe('helicopter');
+  });
+
+  test('heuristic does not flag fast high airline flight as helicopter', () => {
+    const result = processFlights([makeFlight('DAL247', 32.79, -96.81)], uLat, uLon);
+    expect(result[0].isHelicopter).toBe(false);
+  });
 });

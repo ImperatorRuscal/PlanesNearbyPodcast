@@ -104,13 +104,22 @@ const AIRCRAFT_NAMES = {
   HDJT:'HondaJet',
 
   // ── Helicopters ───────────────────────────────────────────────────────────
-  B06:'Bell 206 Helicopter',  B407:'Bell 407 Helicopter',
-  B429:'Bell 429 Helicopter',
-  EC35:'Airbus H135 Helicopter', EC45:'Airbus H145 Helicopter',
-  AS50:'Airbus AS350 Helicopter', AS32:'Airbus AS332 Helicopter',
-  S76:'Sikorsky S-76 Helicopter', S92:'Sikorsky S-92 Helicopter',
+  R22:'Robinson R22',       R44:'Robinson R44',       R66:'Robinson R66',
+  B505:'Bell 505',
+  B06:'Bell 206 JetRanger', B06T:'Bell 206L LongRanger',
+  B407:'Bell 407',          B412:'Bell 412',           B212:'Bell 212',
+  B429:'Bell 429',
+  EC35:'Airbus H135',       EC45:'Airbus H145',
+  EC25:'Airbus H225 Super Puma',
+  AS50:'Airbus H125',       AS32:'Airbus AS332 Super Puma', AS65:'Airbus H155',
+  A109:'AgustaWestland AW109', A119:'AgustaWestland AW119',
+  A139:'AgustaWestland AW139',
+  S61:'Sikorsky S-61',      S70:'Sikorsky S-70',
+  S76:'Sikorsky S-76',      S92:'Sikorsky S-92',
   H60:'Sikorsky Black Hawk',
-  R44:'Robinson R44 Helicopter', R66:'Robinson R66 Helicopter',
+  H500:'MD 500',            MD52:'MD 520N',            MD53:'MD 530F',
+  CH47:'Boeing CH-47 Chinook',
+  MI8:'Mil Mi-8',           MI17:'Mil Mi-17',
 
   // ── Military ──────────────────────────────────────────────────────────────
   C17:'Boeing C-17 Globemaster',   C130:'Lockheed C-130 Hercules',
@@ -123,6 +132,19 @@ const AIRCRAFT_NAMES = {
   // ── Special ───────────────────────────────────────────────────────────────
   A225:"Antonov An-225 — the World's Largest Airplane",
 };
+
+// ICAO type designators for rotorcraft — used to switch emoji and script language.
+const HELICOPTER_TYPES = new Set([
+  'R22','R44','R66',
+  'B505','B06','B06T','B06L','B407','B412','B212','B429',
+  'EC35','EC45','EC25','EC55',
+  'AS50','AS32','AS65',
+  'A109','A119','A139','AW18',
+  'H500','MD52','MD53',
+  'S61','S70','S76','S92','H60',
+  'CH47',
+  'MI8','MI17','MI26',
+]);
 
 const EMERGENCY_SQUAWKS = {
   '7500': 'emergency_7500',
@@ -185,6 +207,7 @@ function processFlights(flights, userLat, userLon) {
     return {
       ...f,
       distanceNm: Math.round(dist * 10) / 10,
+      isHelicopter: HELICOPTER_TYPES.has(f.aircraft_type || ''),
       friendlyType: AIRCRAFT_NAMES[f.aircraft_type] || f.aircraft_type || 'airplane',
       flightawareUrl: `https://www.flightaware.com/live/flight/${f.ident}`,
       ...tagInteresting(f),

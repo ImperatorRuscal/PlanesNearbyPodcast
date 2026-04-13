@@ -191,3 +191,26 @@ test('handles missing origin/destination gracefully', () => {
 test('sub-1nm described as less than one', () => {
   expect(generateScript(makeAircraft({ distanceNm: 0.4 }))).toMatch(/less than/i);
 });
+
+// ── helicopter handling ───────────────────────────────────────────────────────
+
+test('helicopter script omits altitude', () => {
+  const s = generateScript(makeAircraft({ isHelicopter: true, friendlyType: 'Robinson R44' }));
+  expect(s).not.toContain('feet');
+});
+
+test('helicopter script uses helicopter type in sentence', () => {
+  const s = generateScript(makeAircraft({ isHelicopter: true, friendlyType: 'Robinson R44', ident: 'N505FW' }));
+  expect(s).toContain('Robinson R44');
+});
+
+test('helicopter with unknown type falls back to "helicopter" not "airplane"', () => {
+  const s = generateScript(makeAircraft({ isHelicopter: true, friendlyType: null, ident: 'N505FW' }));
+  expect(s).toContain('helicopter');
+  expect(s).not.toContain('airplane');
+});
+
+test('non-helicopter script still includes altitude', () => {
+  const s = generateScript(makeAircraft({ isHelicopter: false }));
+  expect(s).toContain('feet');
+});

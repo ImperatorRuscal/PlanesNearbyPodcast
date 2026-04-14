@@ -7,10 +7,17 @@ const { getNearbyFlights } = require('./services/flightaware');
 const { processFlights } = require('./services/aircraft');
 const { generateScript } = require('./services/scriptGenerator');
 const { renderPage } = require('./views/page');
+const { createStreamRouter } = require('./routes/stream');
+const { audioStore }         = require('./services/audioStore');
+const { synthesize }         = require('./services/tts');
 
 const app = express();
 app.set('trust proxy', 1);
 app.use(express.static(path.join(__dirname, '..', 'public')));
+
+// ── Stream router ─────────────────────────────────────────────────────────
+const audioDir = path.join(__dirname, '..', 'public', 'audio');
+app.use('/stream', createStreamRouter({ buildAircraftData, clientIp, audioStore, synthesize, audioDir }));
 
 function escHtml(s) {
   return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');

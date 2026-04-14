@@ -22,6 +22,9 @@ PlanesNearbyPodcast — Node.js/Express web app that geolocates visitors via IPG
 - `src/services/aircraft.js` — Haversine distance, interesting tagging (emergency/military/medical), sort, dedup
 - `src/services/scriptGenerator.js` — Aircraft object to kid-friendly English string
 - `src/views/page.js` — Full SSR HTML string with embedded JSON for client hydration
+- `src/routes/stream.js` — `/stream/*` router; factory `createStreamRouter({buildAircraftData, clientIp, audioStore, synthesize, audioDir})`
+- `src/services/audioStore.js` — In-memory `Promise<Buffer>` cache keyed by `ip:trackIndex`; TTL matches flight cache; `getPromise`, `setPromise`, `hasAny`, `clear`, `sweep`
+- `src/services/tts.js` — ElevenLabs TTS wrapper; `synthesize(text) → Promise<Buffer>`; random voice per call from `ELEVENLABS_VOICE_IDS` array
 
 ## Key Behaviours
 
@@ -31,6 +34,8 @@ PlanesNearbyPodcast — Node.js/Express web app that geolocates visitors via IPG
 - Aircraft data embedded in page as `<script id="pnp-data" type="application/json">` — parsed client-side
 - Theme (`day`/`night`) calculated server-side via `suncalc` using user lat/lon
 - Client-side DOM updates use `createElement`/`textContent` throughout
+- `/stream/intro.mp3` — static welcome narration; `/stream/squelch-N.mp3` — static squelch or silence; `/stream/aircraft-N.mp3` — TTS-generated narration, cached per IP, 15s timeout → silence
+- First request to any `/stream/aircraft-N.mp3` for an IP fires TTS for ALL aircraft in parallel; subsequent requests within TTL share the same cached promises
 
 ## Environment Variables
 
@@ -38,6 +43,12 @@ PlanesNearbyPodcast — Node.js/Express web app that geolocates visitors via IPG
 |---|---|---|
 | `IPGEO_API_KEY` | Yes | IPGeolocation.io dashboard |
 | `FLIGHTAWARE_API_KEY` | Yes | FlightAware AeroAPI dashboard |
+| `ELEVENLABS_API_KEY` | Yes (for /stream) | ElevenLabs dashboard — Profile → API Keys |
+| `ELEVENLABS_VOICE_IDS` | No | Comma-separated voice IDs; one chosen at random per TTS call. Default: Marty (AU) + Johnny Texas (TX) |
+| `ELEVENLABS_MODEL_ID` | No | Default: `eleven_flash_v2_5` |
+| `ELEVENLABS_SPEED` | No | Default: `1.0` |
+| `ELEVENLABS_STABILITY` | No | Default: `0.45` |
+| `ELEVENLABS_SIMILARITY` | No | Default: `0.80` |
 | `PORT` | No | Injected by Railway automatically |
 
 ## Deployment

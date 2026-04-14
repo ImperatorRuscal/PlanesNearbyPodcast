@@ -59,7 +59,10 @@ ElevenLabs API wrapper. Entirely config-driven — callers pass a text string an
 
 ```js
 // Config (all overridable via env vars):
-ELEVENLABS_VOICE_ID      // default: cFfI4lpGYOvHRUeMr44m (Marty)
+ELEVENLABS_VOICE_IDS     // default: "cFfI4lpGYOvHRUeMr44m,7FroLDTDG92jPfUW6BlQ"
+                         // comma-separated list; parsed to array at startup
+                         // one voice is chosen at random per synthesize() call
+                         // single entry = always that voice
 ELEVENLABS_MODEL_ID      // default: eleven_flash_v2_5
 ELEVENLABS_SPEED         // default: 1.0
 ELEVENLABS_STABILITY     // default: 0.45
@@ -67,6 +70,7 @@ ELEVENLABS_SIMILARITY    // default: 0.80
 
 // Exported function:
 async function synthesize(text: string): Promise<Buffer>
+// Internally picks a random voice from the parsed VOICE_IDS array each call.
 ```
 
 To swap TTS providers later: replace the body of `synthesize()` only. The interface stays the same.
@@ -135,7 +139,7 @@ app.use('/stream', streamRouter);
 ```
 # ElevenLabs TTS (https://elevenlabs.io — create a free/starter account, copy API key from Profile)
 ELEVENLABS_API_KEY=
-ELEVENLABS_VOICE_ID=cFfI4lpGYOvHRUeMr44m
+ELEVENLABS_VOICE_IDS=cFfI4lpGYOvHRUeMr44m,7FroLDTDG92jPfUW6BlQ
 ELEVENLABS_MODEL_ID=eleven_flash_v2_5
 ELEVENLABS_SPEED=1.0
 ELEVENLABS_STABILITY=0.45
@@ -165,7 +169,7 @@ Add `ELEVENLABS_API_KEY` to the environment variables table. Add `/stream/*` rou
 | Variable | Required | Default | Notes |
 |----------|----------|---------|-------|
 | `ELEVENLABS_API_KEY` | Yes | — | From elevenlabs.io Profile → API Keys |
-| `ELEVENLABS_VOICE_ID` | No | `cFfI4lpGYOvHRUeMr44m` | Marty (AU male). Alternatives: `7FroLDTDG92jPfUW6BlQ` (Johnny Texas) |
+| `ELEVENLABS_VOICE_IDS` | No | `cFfI4lpGYOvHRUeMr44m,7FroLDTDG92jPfUW6BlQ` | Comma-separated list. One voice chosen at random per track — creates the effect of different "operators" on each aircraft report. Single entry = always that voice. Defaults include Marty (AU male) and Johnny Texas (TX male). |
 | `ELEVENLABS_MODEL_ID` | No | `eleven_flash_v2_5` | Flash 2.5 = fastest/cheapest. Alternatives: `eleven_v3`, `eleven_multilingual_v2` |
 | `ELEVENLABS_SPEED` | No | `1.0` | 0.7–1.2 range |
 | `ELEVENLABS_STABILITY` | No | `0.45` | 0–1; lower = more expressive |

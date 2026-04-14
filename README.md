@@ -44,16 +44,19 @@ A kid-friendly web app that finds aircraft near your location, describes them in
 
 ### Generate static audio files (one-time)
 
-The `/stream/intro.mp3`, `/stream/squelch-N.mp3`, and out-of-range tracks are static files served from `public/audio/`. You need to generate or place them once before running the server:
+Three files need to live in `public/audio/` before the server starts:
+
+| File | How to get it |
+|---|---|
+| `silence.mp3` | Generated automatically by `node scripts/setup-audio.js` — a single ~26 ms silent MP3 frame, no API key required |
+| `intro.mp3` | You provide this — generate it with any TTS tool (e.g. ElevenLabs), or record your own welcome narration |
+| `squelch.mp3` | You provide this — source a royalty-free radio tuning / squelch sound |
+
+Run the setup script to write `silence.mp3` and verify the other two are present:
 
     node scripts/setup-audio.js
 
-This does two things:
-
-1. **`silence.mp3`** — written immediately from a hardcoded minimal MP3 frame (~26 ms, true digital silence). No ElevenLabs call is needed.
-2. **`intro.mp3`** — synthesized via ElevenLabs and saved to `public/audio/intro.mp3`.
-
-You must also provide **`public/audio/squelch.mp3`** yourself — this is the radio tuning sound that plays between aircraft reports. Source a royalty-free squelch or radio-tuning clip and drop it at that path. The setup script will warn you if it is missing.
+Commit all three files to the repository so they are available in every deployed environment.
 
 Then start the dev server:
 
@@ -69,12 +72,12 @@ Then start the dev server:
 **Step 1 — Push to GitHub**
 Make sure your repo is on GitHub.
 
-**Step 2 — Generate static audio files**
-Before deploying, place `public/audio/squelch.mp3` (your radio tuning clip), then run the setup script and commit everything:
+**Step 2 — Add static audio files**
+Place `public/audio/intro.mp3` and `public/audio/squelch.mp3` (both user-provided — see Local Development above), then run the setup script and commit:
 
-    node scripts/setup-audio.js   # writes silence.mp3; calls ElevenLabs for intro.mp3
+    node scripts/setup-audio.js   # writes silence.mp3; no API key required
     git add public/audio/
-    git commit -m "chore: add generated static audio files"
+    git commit -m "chore: add static audio files"
     git push
 
 **Step 3 — Create Railway project**

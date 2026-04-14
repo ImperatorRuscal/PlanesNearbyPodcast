@@ -23,7 +23,7 @@ function escHtml(s) {
   return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
-const CACHE_TTL_MS = 5 * 60 * 1000;
+const CACHE_TTL_MS = 10 * 60 * 1000;
 const cache = new Cache(CACHE_TTL_MS);
 const PORT = process.env.PORT || 3000;
 

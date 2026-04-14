@@ -16,14 +16,14 @@ PlanesNearbyPodcast — Node.js/Express web app that geolocates visitors via IPG
 ## Architecture
 
 - `src/server.js` — Express app, routes, IP detection, cache wiring
-- `src/cache.js` — In-memory TTL Map (5 min default), keyed by IP; `get`, `set`, `getMetadata`, `sweep`, `clear`
+- `src/cache.js` — In-memory TTL Map (10 min default), keyed by IP; `get`, `set`, `getMetadata`, `sweep`, `clear`
 - `src/services/geolocation.js` — IPGeolocation.io API; returns `{lat, lon, city, state, theme}`
 - `src/services/flightaware.js` — FlightAware AeroAPI `/flights/search` with `-latlong` FLIFO query
 - `src/services/aircraft.js` — Haversine distance, interesting tagging (emergency/military/medical), sort, dedup
 - `src/services/scriptGenerator.js` — Aircraft object to kid-friendly English string
 - `src/views/page.js` — Full SSR HTML string with embedded JSON for client hydration
 - `src/routes/stream.js` — `/stream/*` router; factory `createStreamRouter({buildAircraftData, clientIp, audioStore, synthesize, audioDir})`
-- `src/services/audioStore.js` — In-memory `Promise<Buffer>` cache keyed by `ip:trackIndex`; TTL matches flight cache; `getPromise`, `setPromise`, `hasAny`, `clear`, `sweep`
+- `src/services/audioStore.js` — In-memory `Promise<Buffer>` cache keyed by `ip:trackIndex`; TTL matches flight cache (10 min); `getPromise`, `setPromise`, `hasAny`, `clear`, `sweep`
 - `src/services/tts.js` — ElevenLabs TTS wrapper; `synthesize(text) → Promise<Buffer>`; random voice per call from `ELEVENLABS_VOICE_IDS` array
 
 ## Key Behaviours

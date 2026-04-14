@@ -42,21 +42,16 @@ A kid-friendly web app that finds aircraft near your location, describes them in
     npm install
     cp .env.example .env        # then fill in your API keys
 
-### Generate static audio files (one-time)
+### Static audio files
 
-Three files need to live in `public/audio/` before the server starts:
+Two files need to be placed in `public/audio/` before the server starts (`silence.mp3` is already in the repo):
 
 | File | How to get it |
 |---|---|
-| `silence.mp3` | Generated automatically by `node scripts/setup-audio.js` — a single ~26 ms silent MP3 frame, no API key required |
-| `intro.mp3` | You provide this — generate it with any TTS tool (e.g. ElevenLabs), or record your own welcome narration |
-| `squelch.mp3` | You provide this — source a royalty-free radio tuning / squelch sound |
+| `intro.mp3` | Generate with any TTS tool (e.g. ElevenLabs), or record your own welcome narration |
+| `squelch.mp3` | Source a royalty-free radio tuning / squelch sound |
 
-Run the setup script to write `silence.mp3` and verify the other two are present:
-
-    node scripts/setup-audio.js
-
-Commit all three files to the repository so they are available in every deployed environment.
+Commit both to the repository so they are available in every deployed environment.
 
 Then start the dev server:
 
@@ -73,9 +68,8 @@ Then start the dev server:
 Make sure your repo is on GitHub.
 
 **Step 2 — Add static audio files**
-Place `public/audio/intro.mp3` and `public/audio/squelch.mp3` (both user-provided — see Local Development above), then run the setup script and commit:
+Place `public/audio/intro.mp3` and `public/audio/squelch.mp3` (both user-provided — see Local Development above) and commit them:
 
-    node scripts/setup-audio.js   # writes silence.mp3; no API key required
     git add public/audio/
     git commit -m "chore: add static audio files"
     git push
@@ -159,6 +153,4 @@ To configure the playlist in Yoto Studio, create a new card with 21 tracks and e
         intro.mp3            Generated welcome narration (ElevenLabs via setup-audio.js)
         silence.mp3          Single silent MP3 frame (~26 ms) — written by setup-audio.js
         squelch.mp3          Radio tuning sound — you provide this file
-    scripts/
-      setup-audio.js         One-time script to generate static audio files
     tests/                   Jest test suite

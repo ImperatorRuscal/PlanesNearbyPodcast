@@ -64,11 +64,14 @@ test('GET /stream/playlist.m3u returns M3U with 21 track URLs', async () => {
 
 // ── Static tracks ──────────────────────────────────────────────────────────
 
-test('GET /stream/intro.mp3 serves fixture file', async () => {
+test('GET /stream/intro.mp3 serves fixture file and pre-warms TTS', async () => {
   const app = makeApp();
   const res = await request(app).get('/stream/intro.mp3');
   expect(res.status).toBe(200);
   expect(res.headers['content-type']).toMatch(/audio|octet/);
+  // Give the background promise a tick to resolve before checking
+  await new Promise(r => setTimeout(r, 0));
+  expect(mockSynthesize).toHaveBeenCalledTimes(MOCK_DATA.aircraft.length);
 });
 
 test('GET /stream/silence.mp3 serves fixture file', async () => {

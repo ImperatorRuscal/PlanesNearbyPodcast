@@ -45,7 +45,13 @@ function createStreamRouter({ buildAircraftData, clientIp, audioStore, synthesiz
   }
 
   // ── GET /stream/intro.mp3 ────────────────────────────────────────────────
-  router.get('/intro.mp3', (_req, res) => {
+  // Serve the static file immediately, then fire TTS generation in the
+  // background — the intro's duration is the pre-warm window for synthesis.
+  router.get('/intro.mp3', (req, res) => {
+    const ip = clientIp(req);
+    buildAircraftData(ip)
+      .then(data => ensureGenerated(ip, data.aircraft || []))
+      .catch(err => console.error('[stream] intro pre-warm failed:', err.message));
     sendAudio(res, path.join(audioDir, 'intro.mp3'));
   });
 

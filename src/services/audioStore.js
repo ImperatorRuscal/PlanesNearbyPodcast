@@ -30,12 +30,16 @@ class AudioStore {
   hasAny(ip) {
     const prefix = `${ip}:`;
     const now = Date.now();
+    let found = false;
     for (const [key, entry] of this._store) {
       if (!key.startsWith(prefix)) continue;
-      if (now - entry.cachedAt < this.ttl) return true;
-      this._store.delete(key);
+      if (now - entry.cachedAt < this.ttl) {
+        found = true; // do NOT break — continue to evict remaining expired siblings
+      } else {
+        this._store.delete(key);
+      }
     }
-    return false;
+    return found;
   }
 
   sweep() {

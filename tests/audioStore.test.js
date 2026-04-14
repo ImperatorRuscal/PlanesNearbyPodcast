@@ -18,7 +18,7 @@ describe('AudioStore', () => {
     const p = Promise.resolve(Buffer.from('mp3'));
     store.setPromise('1.2.3.4', 1, p);
     // Force expire by backdating
-    const key = '1.2.3.4:1';
+    const key = store._key('1.2.3.4', 1);
     store._store.get(key).cachedAt -= 10;
     expect(store.getPromise('1.2.3.4', 1)).toBeNull();
   });
@@ -37,7 +37,7 @@ describe('AudioStore', () => {
   test('hasAny returns false after all tracks for IP expire', () => {
     const store = new AudioStore(1);
     store.setPromise('1.2.3.4', 1, Promise.resolve(Buffer.from('x')));
-    const key = '1.2.3.4:1';
+    const key = store._key('1.2.3.4', 1);
     store._store.get(key).cachedAt -= 10;
     expect(store.hasAny('1.2.3.4')).toBe(false);
   });
@@ -59,7 +59,7 @@ describe('AudioStore', () => {
   test('sweep removes expired entries', () => {
     const store = new AudioStore(1);
     store.setPromise('1.2.3.4', 1, Promise.resolve(Buffer.from('x')));
-    const key = '1.2.3.4:1';
+    const key = store._key('1.2.3.4', 1);
     store._store.get(key).cachedAt -= 10;
     store.sweep();
     expect(store._store.has(key)).toBe(false);

@@ -95,18 +95,19 @@ function createStreamRouter({ buildAircraftData, clientIp, audioStore, synthesiz
 
     // Await the specific track's promise with a timeout
     let buf = null;
-    try {
-      const promise = audioStore.getPromise(ip, n);
-      if (promise) {
-        buf = await Promise.race([
-          promise,
-          new Promise((_, reject) =>
-            setTimeout(() => reject(new Error('TTS timeout')), TRACK_TIMEOUT_MS)
-          ),
-        ]);
+    const promise = audioStore.getPromise(ip, n);
+    if (promise) {
+      let timeoutHandle;
+      const timeoutPromise = new Promise((_, reject) => {
+        timeoutHandle = setTimeout(() => reject(new Error('TTS timeout')), TRACK_TIMEOUT_MS);
+      });
+      try {
+        buf = await Promise.race([promise, timeoutPromise]);
+      } catch (err) {
+        console.warn(`[stream] Timeout or error awaiting track ${n} for ${ip}:`, err.message);
+      } finally {
+        clearTimeout(timeoutHandle);
       }
-    } catch (err) {
-      console.warn(`[stream] Timeout or error awaiting track ${n} for ${ip}:`, err.message);
     }
 
     if (!buf) return sendSilence(res);

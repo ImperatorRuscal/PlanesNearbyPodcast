@@ -37,7 +37,6 @@ const MOCK_DATA = {
 };
 
 beforeEach(() => {
-  jest.resetModules();
   jest.clearAllMocks();
   // Reset the shared audioStore so each test starts with a clean cache
   const { audioStore } = require('../src/services/audioStore');

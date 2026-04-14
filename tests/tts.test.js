@@ -84,3 +84,9 @@ test('synthesize throws on non-ok response', async () => {
   const { synthesize } = require('../src/services/tts');
   await expect(synthesize('Hello')).rejects.toThrow('ElevenLabs API error 401');
 });
+
+test('synthesize throws on empty text', async () => {
+  const { synthesize } = require('../src/services/tts');
+  await expect(synthesize('')).rejects.toThrow('synthesize: text must be non-empty');
+  await expect(synthesize('   ')).rejects.toThrow('synthesize: text must be non-empty');
+});

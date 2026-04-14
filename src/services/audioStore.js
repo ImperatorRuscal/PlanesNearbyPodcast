@@ -48,6 +48,10 @@ class AudioStore {
       if (now - entry.cachedAt >= this.ttl) this._store.delete(key);
     }
   }
+
+  clear() {
+    this._store.clear();
+  }
 }
 
 const audioStore = new AudioStore();

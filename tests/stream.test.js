@@ -39,6 +39,9 @@ const MOCK_DATA = {
 beforeEach(() => {
   jest.resetModules();
   jest.clearAllMocks();
+  // Reset the shared audioStore so each test starts with a clean cache
+  const { audioStore } = require('../src/services/audioStore');
+  audioStore.clear();
   mockBuildAircraftData.mockResolvedValue(MOCK_DATA);
   mockSynthesize.mockResolvedValue(Buffer.from([0xff, 0xe0]));
 });

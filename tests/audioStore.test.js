@@ -64,4 +64,13 @@ describe('AudioStore', () => {
     store.sweep();
     expect(store._store.has(key)).toBe(false);
   });
+
+  test('clear removes all entries', () => {
+    const store = new AudioStore(5000);
+    store.setPromise('1.2.3.4', 1, Promise.resolve(Buffer.from('x')));
+    store.setPromise('5.6.7.8', 2, Promise.resolve(Buffer.from('y')));
+    store.clear();
+    expect(store.getPromise('1.2.3.4', 1)).toBeNull();
+    expect(store.getPromise('5.6.7.8', 2)).toBeNull();
+  });
 });

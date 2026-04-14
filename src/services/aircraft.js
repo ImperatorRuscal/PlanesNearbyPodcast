@@ -152,7 +152,11 @@ const EMERGENCY_SQUAWKS = {
   '7700': 'emergency_7700',
 };
 
-const MILITARY_PREFIXES = ['REACH','RCH','ARMY','NAVY','USMC','USCG','SAM','PAT','VENUS','JAKE','SPAR','EVAC','MAGMA'];
+const MILITARY_PREFIXES = [
+  'REACH','RCH','ARMY','NAVY','USMC','USCG','SAM','PAT','VENUS','JAKE','SPAR','EVAC','MAGMA',
+  // US Army helicopter callsigns (and their common AeroAPI truncations)
+  'TANDEM','TANDM','IRON','RANGER','BLADE','COWBOY','RAVEN','KNIFE',
+];
 const MEDICAL_PREFIXES  = ['MEDEVAC','LIFEGUARD','AIRMED','MEDIVAC'];
 
 /**
@@ -206,13 +210,17 @@ function processFlights(flights, userLat, userLon) {
     const dist = haversineNm(userLat, userLon, f.last_position.latitude, f.last_position.longitude);
     // Type-code confirmed rotorcraft
     const typeConfirmed = HELICOPTER_TYPES.has(f.aircraft_type || '');
-    // Heuristic fallback: no type code + registration-style ident + no route + slow + low
+    // Heuristic fallback: no type code + registration-style ident + no route + slow + low.
+    // GPS-origin (FlightAware "L lat lon" prefix) means departure from a helipad/field rather
+    // than a real airport — used as an AND condition to allow up to 150 kts (military helo range)
+    // while keeping the baseline threshold at 120 kts for aircraft without that signal.
     const gs  = f.last_position.groundspeed;
     const alt = f.last_position.altitude;
+    const gpsOrigin = f.origin?.code?.startsWith('L ') ?? false;
     const heuristicHeli = !f.aircraft_type
       && !(/^[A-Z]{3}\d/.test(f.ident || ''))
       && !f.destination
-      && typeof gs  === 'number' && gs  > 0 && gs  < 120
+      && typeof gs  === 'number' && gs  > 0 && (gs < 120 || (gpsOrigin && gs < 150))
       && typeof alt === 'number' && alt > 0 && alt < 30;
     const isHelicopter = typeConfirmed || heuristicHeli;
     return {

@@ -154,8 +154,9 @@ const EMERGENCY_SQUAWKS = {
 
 const MILITARY_PREFIXES = [
   'REACH','RCH','ARMY','NAVY','USMC','USCG','SAM','PAT','VENUS','JAKE','SPAR','EVAC','MAGMA',
-  // US Army helicopter callsigns (and their common AeroAPI truncations)
+  // Additional confirmed military callsigns
   'TANDEM','TANDM','IRON','RANGER','BLADE','COWBOY','RAVEN','KNIFE',
+  'ROPER',  // C-130, NAS Fort Worth JRB (KNFW)
 ];
 const MEDICAL_PREFIXES  = ['MEDEVAC','LIFEGUARD','AIRMED','MEDIVAC'];
 

@@ -55,6 +55,10 @@ describe('tagInteresting', () => {
     expect(tagInteresting({ ...base, ident: 'COWBOY12' }).interestingReason).toBe('military');
   });
 
+  test('ROPER21 = military (C-130, KNFW)', () => {
+    expect(tagInteresting({ ...base, ident: 'ROPER21' }).interestingReason).toBe('military');
+  });
+
   test('LIFEGUARD1 = medical', () => {
     expect(tagInteresting({ ...base, ident: 'LIFEGUARD1' }).interestingReason).toBe('medical');
   });

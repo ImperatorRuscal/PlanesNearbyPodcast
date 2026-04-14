@@ -45,6 +45,23 @@ beforeEach(() => {
   mockSynthesize.mockResolvedValue(Buffer.from([0xff, 0xe0]));
 });
 
+// ── Playlist ───────────────────────────────────────────────────────────────
+
+test('GET /stream/playlist.m3u returns M3U with 21 track URLs', async () => {
+  const app = makeApp();
+  const res = await request(app).get('/stream/playlist.m3u').set('host', 'example.com');
+  expect(res.status).toBe(200);
+  expect(res.headers['content-type']).toMatch(/mpegurl/);
+  expect(res.headers['content-disposition']).toMatch(/planes-nearby\.m3u/);
+  const body = Buffer.isBuffer(res.body) ? res.body.toString('utf8') : res.text;
+  const lines = body.split('\r\n').filter(l => l && !l.startsWith('#'));
+  expect(lines).toHaveLength(21);
+  expect(lines[0]).toBe('http://example.com/stream/intro.mp3');
+  expect(lines[1]).toBe('http://example.com/stream/squelch-1.mp3');
+  expect(lines[2]).toBe('http://example.com/stream/aircraft-1.mp3');
+  expect(lines[lines.length - 1]).toBe('http://example.com/stream/aircraft-10.mp3');
+});
+
 // ── Static tracks ──────────────────────────────────────────────────────────
 
 test('GET /stream/intro.mp3 serves fixture file', async () => {

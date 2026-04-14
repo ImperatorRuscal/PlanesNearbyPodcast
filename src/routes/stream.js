@@ -73,6 +73,19 @@ function createStreamRouter({ buildAircraftData, clientIp, audioStore, synthesiz
     sendAudio(res, path.join(audioDir, 'squelch.mp3'));
   });
 
+  // ── GET /stream/playlist.m3u ────────────────────────────────────────────
+  router.get('/playlist.m3u', (req, res) => {
+    const base = `${req.protocol}://${req.headers.host}`;
+    const lines = ['#EXTM3U', `${base}/stream/intro.mp3`];
+    for (let n = 1; n <= 10; n++) {
+      lines.push(`${base}/stream/squelch-${n}.mp3`);
+      lines.push(`${base}/stream/aircraft-${n}.mp3`);
+    }
+    res.set('Content-Type', 'audio/x-mpegurl');
+    res.set('Content-Disposition', 'attachment; filename="planes-nearby.m3u"');
+    res.send(lines.join('\r\n'));
+  });
+
   // ── GET /stream/aircraft-:n.mp3 ─────────────────────────────────────────
   router.get('/aircraft-:n.mp3', async (req, res) => {
     const n = parseInt(req.params.n, 10);

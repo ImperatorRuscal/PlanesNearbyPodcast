@@ -182,6 +182,8 @@ function renderPage(data) {
       padding-top:8px;margin-top:8px;font-style:italic}
     .empty-state{text-align:center;padding:40px 20px;opacity:.7}
     .empty-state .emoji{font-size:3rem;margin-bottom:12px}
+    .playlist-link{font-size:.85rem;opacity:.25;text-decoration:none;line-height:1;transition:opacity .2s}
+    .playlist-link:hover{opacity:.6}
   </style>
 </head>
 <body class="theme-${esc(theme)}">
@@ -193,6 +195,7 @@ function renderPage(data) {
   <div class="header-right">
     <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn">Switch to Basic View</button>
     <button class="reload-btn" id="reload-btn" onclick="reloadData()" disabled>Reload &#x2014; loading&hellip;</button>
+    <a class="playlist-link" href="/stream/playlist.m3u" download="planes-nearby.m3u" title="Download audio playlist">&#x1F508;</a>
   </div>
 </header>
 

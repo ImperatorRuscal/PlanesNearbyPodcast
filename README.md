@@ -94,6 +94,7 @@ In your Railway service > Variables tab, add:
 | FLIGHTAWARE_API_KEY | Your FlightAware AeroAPI key |
 | ELEVENLABS_API_KEY | Your ElevenLabs key |
 | ELEVENLABS_VOICE_IDS | (Optional) Comma-separated voice IDs |
+| CACHE_TTL_MS | (Optional) Flight-data and audio cache TTL in ms — default 600000 (10 min) |
 
 Railway injects PORT and NODE_ENV automatically.
 

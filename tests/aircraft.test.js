@@ -43,6 +43,30 @@ describe('tagInteresting', () => {
     expect(tagInteresting({ ...base, ident: 'SAM45000' }).interestingReason).toBe('military');
   });
 
+  test('TANDEM29 = military', () => {
+    expect(tagInteresting({ ...base, ident: 'TANDEM29' }).interestingReason).toBe('military');
+  });
+
+  test('TANDM29 = military (AeroAPI-truncated TANDEM)', () => {
+    expect(tagInteresting({ ...base, ident: 'TANDM29' }).interestingReason).toBe('military');
+  });
+
+  test('COWBOY12 = military', () => {
+    expect(tagInteresting({ ...base, ident: 'COWBOY12' }).interestingReason).toBe('military');
+  });
+
+  test('ROPER21 = military (C-130, KNFW)', () => {
+    expect(tagInteresting({ ...base, ident: 'ROPER21' }).interestingReason).toBe('military');
+  });
+
+  test.each([
+    'BEAST01','BEAVER2','BILLY11','BLACKSHEEP1','BLAZER4','BLEED7',
+    'BOLD12','BOOMER3','BRADY9','BREW5','BULLET6','CAJUN8',
+    'CASH10','CHETAH2','CLEAT3','MUSTANG7',
+  ])('%s = military (locally observed at KNFW)', ident => {
+    expect(tagInteresting({ ...base, ident }).interestingReason).toBe('military');
+  });
+
   test('LIFEGUARD1 = medical', () => {
     expect(tagInteresting({ ...base, ident: 'LIFEGUARD1' }).interestingReason).toBe('medical');
   });
@@ -149,6 +173,38 @@ describe('processFlights', () => {
 
   test('heuristic does not flag fast high airline flight as helicopter', () => {
     const result = processFlights([makeFlight('DAL247', 32.79, -96.81)], uLat, uLon);
+    expect(result[0].isHelicopter).toBe(false);
+  });
+
+  test('heuristic detects GPS-origin military helo at 131 kts (TANDM29 pattern)', () => {
+    const f = makeFlight('TANDM29', 32.79, -96.81, {
+      aircraft_type: null, destination: null,
+      origin: { code: 'L 32.73108 -96.97865', city: 'Grand Prairie', name: null },
+      last_position: { latitude: 32.79, longitude: -96.81, altitude: 14, groundspeed: 131 },
+    });
+    const result = processFlights([f], uLat, uLon);
+    expect(result[0].isHelicopter).toBe(true);
+  });
+
+  test('heuristic does not flag 131 kt aircraft without GPS origin as helicopter', () => {
+    // Same speed as TANDM29 but departing a real airport — should NOT be a helo
+    const f = makeFlight('N12345', 32.79, -96.81, {
+      aircraft_type: null, destination: null,
+      origin: { code: 'KGPM', city: 'Grand Prairie', name: 'Grand Prairie Municipal' },
+      last_position: { latitude: 32.79, longitude: -96.81, altitude: 14, groundspeed: 131 },
+    });
+    const result = processFlights([f], uLat, uLon);
+    expect(result[0].isHelicopter).toBe(false);
+  });
+
+  test('heuristic does not flag 150+ kt GPS-origin aircraft as helicopter', () => {
+    // Above the extended threshold even with GPS origin — not a helo
+    const f = makeFlight('N12345', 32.79, -96.81, {
+      aircraft_type: null, destination: null,
+      origin: { code: 'L 32.73108 -96.97865', city: 'Grand Prairie', name: null },
+      last_position: { latitude: 32.79, longitude: -96.81, altitude: 14, groundspeed: 155 },
+    });
+    const result = processFlights([f], uLat, uLon);
     expect(result[0].isHelicopter).toBe(false);
   });
 });

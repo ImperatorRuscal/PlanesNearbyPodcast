@@ -44,14 +44,16 @@ A kid-friendly web app that finds aircraft near your location, describes them in
 
 ### Generate static audio files (one-time)
 
-The `/stream/intro.mp3` and `/stream/squelch-N.mp3` tracks are static files served from `public/audio/`. You need to generate them once before running the server:
+The `/stream/intro.mp3`, `/stream/squelch-N.mp3`, and out-of-range tracks are static files served from `public/audio/`. You need to generate or place them once before running the server:
 
     node scripts/setup-audio.js
 
-This calls ElevenLabs to synthesize the intro narration and saves it to `public/audio/intro.mp3`. For the squelch/silence tracks, you can either:
+This does two things:
 
-- **Option A:** Let the script write short silent MP3 files automatically (it synthesizes a minimal clip)
-- **Option B:** Drop your own `silence.mp3` (a short squelch sound or genuine silence) into `public/audio/` — the script will skip any file that already exists
+1. **`silence.mp3`** — written immediately from a hardcoded minimal MP3 frame (~26 ms, true digital silence). No ElevenLabs call is needed.
+2. **`intro.mp3`** — synthesized via ElevenLabs and saved to `public/audio/intro.mp3`.
+
+You must also provide **`public/audio/squelch.mp3`** yourself — this is the radio tuning sound that plays between aircraft reports. Source a royalty-free squelch or radio-tuning clip and drop it at that path. The setup script will warn you if it is missing.
 
 Then start the dev server:
 
@@ -68,9 +70,9 @@ Then start the dev server:
 Make sure your repo is on GitHub.
 
 **Step 2 — Generate static audio files**
-Before deploying, run the setup script locally (requires `ELEVENLABS_API_KEY` in your `.env`) and commit the generated files:
+Before deploying, place `public/audio/squelch.mp3` (your radio tuning clip), then run the setup script and commit everything:
 
-    node scripts/setup-audio.js
+    node scripts/setup-audio.js   # writes silence.mp3; calls ElevenLabs for intro.mp3
     git add public/audio/
     git commit -m "chore: add generated static audio files"
     git push
@@ -150,8 +152,9 @@ To configure the playlist in Yoto Studio, create a new card with 21 tracks and e
     public/
       fa-logo.png            FlightAware attribution logo
       audio/
-        intro.mp3            Generated welcome narration (run setup-audio.js)
-        silence.mp3          Short silent clip used for squelch tracks
+        intro.mp3            Generated welcome narration (ElevenLabs via setup-audio.js)
+        silence.mp3          Single silent MP3 frame (~26 ms) — written by setup-audio.js
+        squelch.mp3          Radio tuning sound — you provide this file
     scripts/
       setup-audio.js         One-time script to generate static audio files
     tests/                   Jest test suite

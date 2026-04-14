@@ -34,7 +34,7 @@ PlanesNearbyPodcast — Node.js/Express web app that geolocates visitors via IPG
 - Aircraft data embedded in page as `<script id="pnp-data" type="application/json">` — parsed client-side
 - Theme (`day`/`night`) calculated server-side via `suncalc` using user lat/lon
 - Client-side DOM updates use `createElement`/`textContent` throughout
-- `/stream/intro.mp3` — static welcome narration; `/stream/squelch-N.mp3` — static squelch or silence; `/stream/aircraft-N.mp3` — TTS-generated narration, cached per IP, 15s timeout → silence
+- `/stream/intro.mp3` — static welcome narration; `/stream/squelch-N.mp3` — serves `public/audio/squelch.mp3` (radio tuning clip) when N ≤ aircraft count, otherwise `silence.mp3` (single silent frame); `/stream/aircraft-N.mp3` — TTS narration when N ≤ aircraft count, otherwise `silence.mp3`; 15s timeout → silence
 - First request to any `/stream/aircraft-N.mp3` for an IP fires TTS for ALL aircraft in parallel; subsequent requests within TTL share the same cached promises
 
 ## Environment Variables

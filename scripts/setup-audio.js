@@ -22,8 +22,9 @@ const ASSETS = [
   },
   {
     file: 'silence.mp3',
-    // Synthesize near-silence: shortest real word for minimal audio.
-    text: 'one',
+    // A single period produces the shortest possible ElevenLabs clip — a brief
+    // near-silent audio frame used as a padding track between aircraft reports.
+    text: '.',
   },
 ];
 
@@ -43,7 +44,9 @@ async function main() {
     }
     console.log(`Generating ${asset.file}...`);
     const buf = await synthesize(asset.text);
-    fs.writeFileSync(dest, buf);
+    const tmp = dest + '.tmp';
+    fs.writeFileSync(tmp, buf);
+    fs.renameSync(tmp, dest);
     console.log(`  Written ${buf.length} bytes to ${dest}`);
   }
 

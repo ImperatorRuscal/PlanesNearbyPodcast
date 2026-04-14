@@ -59,6 +59,14 @@ describe('tagInteresting', () => {
     expect(tagInteresting({ ...base, ident: 'ROPER21' }).interestingReason).toBe('military');
   });
 
+  test.each([
+    'BEAST01','BEAVER2','BILLY11','BLACKSHEEP1','BLAZER4','BLEED7',
+    'BOLD12','BOOMER3','BRADY9','BREW5','BULLET6','CAJUN8',
+    'CASH10','CHETAH2','CLEAT3','MUSTANG7',
+  ])('%s = military (locally observed at KNFW)', ident => {
+    expect(tagInteresting({ ...base, ident }).interestingReason).toBe('military');
+  });
+
   test('LIFEGUARD1 = medical', () => {
     expect(tagInteresting({ ...base, ident: 'LIFEGUARD1' }).interestingReason).toBe('medical');
   });

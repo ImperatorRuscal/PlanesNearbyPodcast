@@ -154,9 +154,12 @@ const EMERGENCY_SQUAWKS = {
 
 const MILITARY_PREFIXES = [
   'REACH','RCH','ARMY','NAVY','USMC','USCG','SAM','PAT','VENUS','JAKE','SPAR','EVAC','MAGMA',
-  // Additional confirmed military callsigns
+  // Additional confirmed military callsigns (various types)
   'TANDEM','TANDM','IRON','RANGER','BLADE','COWBOY','RAVEN','KNIFE',
   'ROPER',  // C-130, NAS Fort Worth JRB (KNFW)
+  // Locally observed transiting KNFW
+  'BEAST','BEAVER','BILLY','BLACKSHEEP','BLAZER','BLEED','BOLD','BOOMER',
+  'BRADY','BREW','BULLET','CAJUN','CASH','CHETAH','CLEAT','MUSTANG',
 ];
 const MEDICAL_PREFIXES  = ['MEDEVAC','LIFEGUARD','AIRMED','MEDIVAC'];
 

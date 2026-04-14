@@ -1,6 +1,6 @@
 # Planes Nearby Podcast
 
-A kid-friendly web app that finds aircraft near your location and describes them in fun, plain language.
+A kid-friendly web app that finds aircraft near your location, describes them in fun, plain language, and plays them as an audio podcast you can listen to on a Yoto player.
 
 ## What It Does
 
@@ -10,6 +10,7 @@ A kid-friendly web app that finds aircraft near your location and describes them
 4. Generates a kid-friendly description for each plane
 5. Caches results per visitor per 5 minutes to keep API calls low
 6. Shows a live Leaflet map with each aircraft plotted
+7. Streams a Yoto-compatible audio playlist: intro narration + per-aircraft TTS clips via ElevenLabs
 
 ## Prerequisites
 
@@ -29,12 +30,31 @@ A kid-friendly web app that finds aircraft near your location and describes them
 2. Create an API key in Account Settings
 3. **Note:** AeroAPI is a paid service. Each unique visitor triggers one search request per 5-minute window.
 
+### ElevenLabs
+1. Create a free account at [elevenlabs.io](https://elevenlabs.io)
+2. Go to Profile → API Keys and copy your key
+3. Free tier: 10,000 characters/month — enough for light testing
+
 ## Local Development
 
     git clone https://github.com/YOUR_USERNAME/PlanesNearbyPodcast.git
     cd PlanesNearbyPodcast
     npm install
-    cp .env.example .env        # then fill in your two API keys
+    cp .env.example .env        # then fill in your API keys
+
+### Static audio files
+
+Two files need to be placed in `public/audio/` before the server starts (`silence.mp3` is already in the repo):
+
+| File | How to get it |
+|---|---|
+| `intro.mp3` | Generate with any TTS tool (e.g. ElevenLabs), or record your own welcome narration |
+| `squelch.mp3` | Source a royalty-free radio tuning / squelch sound |
+
+Commit both to the repository so they are available in every deployed environment.
+
+Then start the dev server:
+
     npm run dev
     # Open: http://localhost:3000?ip=8.8.8.8
     # (127.0.0.1 cannot be geolocated — use ?ip= to test)
@@ -47,25 +67,35 @@ A kid-friendly web app that finds aircraft near your location and describes them
 **Step 1 — Push to GitHub**
 Make sure your repo is on GitHub.
 
-**Step 2 — Create Railway project**
+**Step 2 — Add static audio files**
+Place `public/audio/intro.mp3` and `public/audio/squelch.mp3` (both user-provided — see Local Development above) and commit them:
+
+    git add public/audio/
+    git commit -m "chore: add static audio files"
+    git push
+
+**Step 3 — Create Railway project**
 - Log in to railway.app
 - Click New Project > Deploy from GitHub repo
 - Select PlanesNearbyPodcast
 
-**Step 3 — Set environment variables**
+**Step 4 — Set environment variables**
 In your Railway service > Variables tab, add:
 
 | Name | Value |
 |---|---|
 | IPGEO_API_KEY | Your IPGeolocation.io key |
 | FLIGHTAWARE_API_KEY | Your FlightAware AeroAPI key |
+| ELEVENLABS_API_KEY | Your ElevenLabs key |
+| ELEVENLABS_VOICE_IDS | (Optional) Comma-separated voice IDs |
+| CACHE_TTL_MS | (Optional) Flight-data and audio cache TTL in ms — default 600000 (10 min) |
 
 Railway injects PORT and NODE_ENV automatically.
 
-**Step 4 — Enable PR preview deployments**
+**Step 5 — Enable PR preview deployments**
 In Railway project Settings > find Preview Environments and toggle it ON.
 
-**Step 5 — Add GitHub secrets for PR preview comments**
+**Step 6 — Add GitHub secrets for PR preview comments**
 
 Get your Railway token: Railway dashboard > avatar (top-right) > Account Settings > Tokens > Create Token
 
@@ -80,33 +110,47 @@ In your GitHub repo > Settings > Secrets and variables > Actions, add:
 
 When you open a PR, a bot will post a comment with the preview URL once the deployment is ready.
 
-**Step 6 — Verify**
+**Step 7 — Verify**
 Open the deployment URL from your Railway dashboard. You should see aircraft data for your location.
+
+## Yoto Playlist Setup
+
+The audio stream exposes a 21-track Yoto-compatible playlist. Each track is a URL pointing to your deployed server.
+
+| Track | URL | Content |
+|---|---|---|
+| 1 | `https://YOUR_DOMAIN/stream/intro.mp3` | Welcome narration |
+| 2 | `https://YOUR_DOMAIN/stream/squelch-1.mp3` | Short pause / squelch |
+| 3 | `https://YOUR_DOMAIN/stream/aircraft-1.mp3` | Closest aircraft |
+| 4 | `https://YOUR_DOMAIN/stream/squelch-2.mp3` | Short pause / squelch |
+| 5 | `https://YOUR_DOMAIN/stream/aircraft-2.mp3` | 2nd closest aircraft |
+| … | … | Alternating squelch + aircraft up to 10 aircraft |
+| 21 | `https://YOUR_DOMAIN/stream/squelch-10.mp3` | Final squelch |
+
+Tracks beyond the current aircraft count return silence automatically — no dead air errors on the Yoto player.
+
+To configure the playlist in Yoto Studio, create a new card with 21 tracks and enter each URL above with your Railway deployment domain substituted for `YOUR_DOMAIN`.
 
 ## Project Structure
 
     src/
       server.js              Express app and routes
       cache.js               In-memory 5-minute TTL cache
+      routes/
+        stream.js            /stream/* router (intro, squelch, aircraft TTS)
       services/
         geolocation.js       IPGeolocation.io integration
         flightaware.js       FlightAware AeroAPI integration
         aircraft.js          Filtering, sorting, Haversine distance
         scriptGenerator.js   Kid-friendly text generation
+        audioStore.js        In-memory Promise<Buffer> cache for TTS audio
+        tts.js               ElevenLabs TTS wrapper
       views/
         page.js              SSR HTML page generator
     public/
       fa-logo.png            FlightAware attribution logo
+      audio/
+        intro.mp3            Generated welcome narration (ElevenLabs via setup-audio.js)
+        silence.mp3          Single silent MP3 frame (~26 ms) — written by setup-audio.js
+        squelch.mp3          Radio tuning sound — you provide this file
     tests/                   Jest test suite
-
-## Future: Audio / Yoto Expansion
-
-The /api/aircraft endpoint already returns a `script` field on each aircraft.
-To add audio output when ready:
-
-1. Call GET /api/aircraft
-2. Pass each aircraft.script to ElevenLabs or Google TTS
-3. Stitch returned audio into an MP3
-4. Add a GET /api/podcast.mp3 route
-
-No changes to existing code are needed — the TTS route slots in alongside what is already there.

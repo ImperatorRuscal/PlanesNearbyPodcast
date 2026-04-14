@@ -7,16 +7,23 @@ const { getNearbyFlights } = require('./services/flightaware');
 const { processFlights } = require('./services/aircraft');
 const { generateScript } = require('./services/scriptGenerator');
 const { renderPage } = require('./views/page');
+const { createStreamRouter } = require('./routes/stream');
+const { audioStore }         = require('./services/audioStore');
+const { synthesize }         = require('./services/tts');
 
 const app = express();
 app.set('trust proxy', 1);
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
+// ── Stream router ─────────────────────────────────────────────────────────
+const audioDir = path.join(__dirname, '..', 'public', 'audio');
+app.use('/stream', createStreamRouter({ buildAircraftData, clientIp, audioStore, synthesize, audioDir }));
+
 function escHtml(s) {
   return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
-const CACHE_TTL_MS = 5 * 60 * 1000;
+const CACHE_TTL_MS = parseInt(process.env.CACHE_TTL_MS || '') || 10 * 60 * 1000;
 const cache = new Cache(CACHE_TTL_MS);
 const PORT = process.env.PORT || 3000;
 

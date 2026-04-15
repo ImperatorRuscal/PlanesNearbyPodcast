@@ -1,5 +1,5 @@
 class Cache {
-  constructor(ttlMs = 5 * 60 * 1000) {
+  constructor(ttlMs = 10 * 60 * 1000) {
     this.ttl = ttlMs;
     this.store = new Map(); // key -> { data, cachedAt }
     this._sweepInterval = setInterval(() => this.sweep(), 10 * 60 * 1000);

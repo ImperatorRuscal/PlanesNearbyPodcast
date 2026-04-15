@@ -5,10 +5,10 @@ A kid-friendly web app that finds aircraft near your location, describes them in
 ## What It Does
 
 1. Detects your approximate location from your IP (IPGeolocation.io)
-2. Finds aircraft within 10 nautical miles via FlightAware AeroAPI
+2. Finds aircraft within 15 nautical miles via FlightAware AeroAPI
 3. Highlights the 5 closest planes plus any interesting ones (emergencies, military, medical)
 4. Generates a kid-friendly description for each plane
-5. Caches results per visitor per 5 minutes to keep API calls low
+5. Caches results per visitor per 10 minutes to keep API calls low
 6. Shows a live Leaflet map with each aircraft plotted
 7. Streams a Yoto-compatible audio playlist: intro narration + per-aircraft TTS clips via ElevenLabs
 
@@ -28,7 +28,7 @@ A kid-friendly web app that finds aircraft near your location, describes them in
 ### FlightAware AeroAPI
 1. Sign up at [flightaware.com/aeroapi](https://www.flightaware.com/aeroapi/)
 2. Create an API key in Account Settings
-3. **Note:** AeroAPI is a paid service. Each unique visitor triggers one search request per 5-minute window.
+3. **Note:** AeroAPI is a paid service. Each unique visitor triggers one search request per 10-minute window.
 
 ### ElevenLabs
 1. Create a free account at [elevenlabs.io](https://elevenlabs.io)
@@ -135,7 +135,7 @@ To configure the playlist in Yoto Studio, create a new card with 21 tracks and e
 
     src/
       server.js              Express app and routes
-      cache.js               In-memory 5-minute TTL cache
+      cache.js               In-memory 10-minute TTL cache
       routes/
         stream.js            /stream/* router (intro, squelch, aircraft TTS)
       services/

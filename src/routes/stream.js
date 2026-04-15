@@ -32,10 +32,9 @@ function createStreamRouter({ buildAircraftData, clientIp, audioStore, synthesiz
    * for the same IP share the same in-flight call.
    */
   function ensureGenerated(ip, aircraft) {
-    if (audioStore.hasAny(ip)) return; // already generating or cached
-
     aircraft.forEach((a, i) => {
       const trackIndex = i + 1;
+      if (audioStore.getPromise(ip, trackIndex) !== null) return; // already in-flight or cached
       const promise = synthesize(a.script).catch(err => {
         console.warn(`[stream] TTS failed for ${ip} track ${trackIndex}:`, err.message);
         return null; // null sentinel → serve silence

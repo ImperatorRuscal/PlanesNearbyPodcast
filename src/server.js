@@ -9,7 +9,7 @@ const { generateScript } = require('./services/scriptGenerator');
 const { renderPage } = require('./views/page');
 const { createStreamRouter }          = require('./routes/stream');
 const { audioStore }                  = require('./services/audioStore');
-const { synthesize }                  = require('./services/tts');
+const { synthesize, VOICE_IDS }       = require('./services/tts');
 const { initTargetLufs, normalize }   = require('./services/audioNormalizer');
 
 const app = express();
@@ -19,8 +19,8 @@ app.use(express.static(path.join(__dirname, '..', 'public')));
 // ── Stream router ─────────────────────────────────────────────────────────
 const audioDir = path.join(__dirname, '..', 'public', 'audio');
 
-async function synthesizeNormalized(text) {
-  const buf = await synthesize(text);
+async function synthesizeNormalized(text, voiceId) {
+  const buf = await synthesize(text, voiceId);
   try {
     return await normalize(buf);
   } catch (err) {
@@ -29,7 +29,7 @@ async function synthesizeNormalized(text) {
   }
 }
 
-app.use('/stream', createStreamRouter({ buildAircraftData, clientIp, audioStore, synthesize: synthesizeNormalized, audioDir }));
+app.use('/stream', createStreamRouter({ buildAircraftData, clientIp, audioStore, synthesize: synthesizeNormalized, voiceIds: VOICE_IDS, audioDir }));
 
 function escHtml(s) {
   return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');

@@ -8,14 +8,14 @@ const SPEED       = parseFloat(process.env.ELEVENLABS_SPEED       || '1.0');
 const STABILITY   = parseFloat(process.env.ELEVENLABS_STABILITY   || '0.45');
 const SIMILARITY  = parseFloat(process.env.ELEVENLABS_SIMILARITY  || '0.80');
 
-async function synthesize(text) {
+async function synthesize(text, voiceId) {
   if (!text || !text.trim()) throw new Error('synthesize: text must be non-empty');
 
   const apiKey = process.env.ELEVENLABS_API_KEY;
   if (!apiKey) throw new Error('ELEVENLABS_API_KEY is not set');
 
-  const voiceId = VOICE_IDS[Math.floor(Math.random() * VOICE_IDS.length)];
-  const url = `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`;
+  const selectedVoice = voiceId ?? VOICE_IDS[Math.floor(Math.random() * VOICE_IDS.length)];
+  const url = `https://api.elevenlabs.io/v1/text-to-speech/${selectedVoice}`;
 
   const ac = new AbortController();
   const timer = setTimeout(() => ac.abort(), 10_000);
@@ -52,4 +52,4 @@ async function synthesize(text) {
   return Buffer.from(arrayBuf);
 }
 
-module.exports = { synthesize };
+module.exports = { synthesize, VOICE_IDS };

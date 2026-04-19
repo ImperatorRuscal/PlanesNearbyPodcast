@@ -3,6 +3,15 @@ const path    = require('path');
 
 const TRACK_TIMEOUT_MS = 15_000;
 
+function shuffleArray(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
 /**
  * Factory function to avoid circular imports with server.js.
  *
@@ -10,10 +19,11 @@ const TRACK_TIMEOUT_MS = 15_000;
  * @param {Function} deps.buildAircraftData  (ip) => Promise<{aircraft}>
  * @param {Function} deps.clientIp           (req) => string
  * @param {object}   deps.audioStore         AudioStore singleton
- * @param {Function} deps.synthesize         (text) => Promise<Buffer>
+ * @param {Function} deps.synthesize         (text, voiceId?) => Promise<Buffer>
+ * @param {string[]} deps.voiceIds           pool of ElevenLabs voice IDs for batch assignment
  * @param {string}   deps.audioDir           absolute path to directory with intro/squelch/silence MP3s
  */
-function createStreamRouter({ buildAircraftData, clientIp, audioStore, synthesize, audioDir }) {
+function createStreamRouter({ buildAircraftData, clientIp, audioStore, synthesize, voiceIds = [], audioDir }) {
   const router = express.Router();
 
   function sendAudio(res, filePath) {
@@ -32,10 +42,14 @@ function createStreamRouter({ buildAircraftData, clientIp, audioStore, synthesiz
    * for the same IP share the same in-flight call.
    */
   function ensureGenerated(ip, aircraft) {
+    // Shuffle the voice pool so each track in the batch gets a distinct voice.
+    // Cycles through another shuffled round if there are more tracks than voices.
+    const voices = voiceIds.length > 1 ? shuffleArray(voiceIds) : voiceIds;
     aircraft.forEach((a, i) => {
       const trackIndex = i + 1;
       if (audioStore.getPromise(ip, trackIndex) !== null) return; // already in-flight or cached
-      const promise = synthesize(a.script).catch(err => {
+      const voiceId = voices.length ? voices[i % voices.length] : undefined;
+      const promise = synthesize(a.script, voiceId).catch(err => {
         console.warn(`[stream] TTS failed for ${ip} track ${trackIndex}:`, err.message);
         return null; // null sentinel → serve silence
       });

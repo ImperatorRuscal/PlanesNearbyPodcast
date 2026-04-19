@@ -7,9 +7,10 @@ const { getNearbyFlights } = require('./services/flightaware');
 const { processFlights } = require('./services/aircraft');
 const { generateScript } = require('./services/scriptGenerator');
 const { renderPage } = require('./views/page');
-const { createStreamRouter } = require('./routes/stream');
-const { audioStore }         = require('./services/audioStore');
-const { synthesize }         = require('./services/tts');
+const { createStreamRouter }          = require('./routes/stream');
+const { audioStore }                  = require('./services/audioStore');
+const { synthesize, VOICE_IDS }       = require('./services/tts');
+const { initTargetLufs, normalize }   = require('./services/audioNormalizer');
 
 const app = express();
 app.set('trust proxy', 1);
@@ -17,7 +18,18 @@ app.use(express.static(path.join(__dirname, '..', 'public')));
 
 // ── Stream router ─────────────────────────────────────────────────────────
 const audioDir = path.join(__dirname, '..', 'public', 'audio');
-app.use('/stream', createStreamRouter({ buildAircraftData, clientIp, audioStore, synthesize, audioDir }));
+
+async function synthesizeNormalized(text, voiceId) {
+  const buf = await synthesize(text, voiceId);
+  try {
+    return await normalize(buf);
+  } catch (err) {
+    console.warn('[normalizer] normalization failed, using raw buffer:', err.message);
+    return buf;
+  }
+}
+
+app.use('/stream', createStreamRouter({ buildAircraftData, clientIp, audioStore, synthesize: synthesizeNormalized, voiceIds: VOICE_IDS, audioDir }));
 
 function escHtml(s) {
   return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -85,5 +97,7 @@ app.get('/', async (req, res) => {
 module.exports = app;
 
 if (require.main === module) {
+  // Measure intro.mp3 loudness so TTS output is normalized to match.
+  initTargetLufs(path.join(audioDir, 'intro.mp3'));
   app.listen(PORT, () => console.log(`PlanesNearbyPodcast running on port ${PORT}`));
 }
